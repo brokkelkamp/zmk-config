@@ -10,8 +10,11 @@
 #include <dt-bindings/zmk/ext_power.h>
 #include <dt-bindings/zmk/pointing.h>
 
-&left_encoder { resolution = <1>; };
-&left_encoder { resolution = <30>; };
+
+// Encoders
+&sensors        { triggers-per-rotation = <30>; };
+&left_encoder   { steps = <60>; };
+&right_encoder  { steps = <60>; };
 
 / {
     keymap {
