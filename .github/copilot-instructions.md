@@ -6,14 +6,14 @@ This is a ZMK (Zephyr Mechanical Keyboard) firmware configuration repository for
 
 - **Build System**: GitHub Actions CI/CD using ZMK's reusable workflow (`zmkfirmware/zmk/.github/workflows/build-user-config.yml@v0.3`)
 - **Configuration Location**: All keyboard-specific configs are in [config/](config/)
-- **Hardware**: nice!nano controller with splitkb_aurora_lily58 shield + nice_view display
+- **Hardware**: nice!nano controller with splitkb_aurora_lily58 shield + nice!view displays (zmk-nice-oled `nice_epaper` shield)
 - **Build Matrix**: Defined in [build.yaml](build.yaml) - builds left/right halves separately plus settings_reset
 
 ## Key Files
 
 - [config/splitkb_aurora_lily58.keymap](config/splitkb_aurora_lily58.keymap): Main keymap definition using ZMK devicetree format
 - [config/splitkb_aurora_lily58.conf](config/splitkb_aurora_lily58.conf): Feature flags (encoders, display, pointing)
-- [config/west.yml](config/west.yml): West manifest pointing to `zmkfirmware/zmk@main`
+- [config/west.yml](config/west.yml): West manifest pinning `zmkfirmware/zmk@v0.3.0` plus the `zmk-nice-oled` module
 - [build.yaml](build.yaml): Build matrix for GitHub Actions (left, right, settings_reset)
 
 ## Keymap Structure (Devicetree)
@@ -60,13 +60,13 @@ Example from [splitkb_aurora_lily58.keymap#L62](config/splitkb_aurora_lily58.key
 ### Feature Flags ([splitkb_aurora_lily58.conf](config/splitkb_aurora_lily58.conf))
 - Encoder support: `CONFIG_EC11=y` + `CONFIG_EC11_TRIGGER_GLOBAL_THREAD=y`
 - Mouse/pointing: `CONFIG_ZMK_POINTING=y` (enables `&msc` behaviors)
-- Display: `CONFIG_ZMK_DISPLAY=y` (for nice!view)
+- Display: `CONFIG_ZMK_DISPLAY=y` + `CONFIG_ZMK_DISPLAY_STATUS_SCREEN_CUSTOM=y` (zmk-nice-oled)
 - macOS compatibility: `CONFIG_ZMK_HID_CONSUMER_REPORT_USAGES_BASIC=y`
 
 ### Sensor Bindings (Encoders)
 Each layer defines encoder behavior via `sensor-bindings`:
 - Volume: `&inc_dec_kp C_VOL_DN C_VOL_UP`
-- Scroll: `&msc SCRL_DOWN`, `&msc SCRL_UP` (requires CONFIG_ZMK_POINTING)
+- Scroll: `&scroll_encoder` (right encoder; one `&msc` tick per detent, `ENC_SCROLL_LINES` lines, requires CONFIG_ZMK_POINTING)
 - Page: `&inc_dec_kp PAGE_DOWN PAGE_UP`
 
 ## Build & Deploy Workflow
@@ -98,8 +98,8 @@ Add to `keymap` block, access via `&mo N` where N is zero-indexed layer number.
 
 ## External Dependencies
 
-- **ZMK Firmware**: Pulled from `zmkfirmware/zmk@main` via West (Zephyr build tool)
-- **Shields**: `splitkb_aurora_lily58_{left,right}`, `nice_view_adapter`, `nice_view`
-- **Board**: `nice_nano` (nRF52840 controller)
+- **ZMK Firmware**: Pinned to `zmkfirmware/zmk@v0.3.0` via West (zmk-nice-oled does not support Zephyr 4.1 yet)
+- **Shields**: `splitkb_aurora_lily58_{left,right}`, `nice_view_adapter`, `nice_epaper` (from zmk-nice-oled)
+- **Board**: `nice_nano_v2` (nRF52840 controller)
 
 West automatically fetches dependencies during CI build - no manual setup required for normal keymap changes.
